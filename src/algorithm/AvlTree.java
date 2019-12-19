@@ -1,7 +1,6 @@
 package algorithm;
 
 import lombok.Data;
-import sun.misc.JavaUtilJarAccess;
 
 /**
  * avl树
@@ -26,6 +25,67 @@ public class AvlTree<T extends Comparable<? super T>> {
 
     public void delete(T t){
         root = remove(t, root);
+    }
+
+    public void printTreeMidRoot(){
+        printTreeMidRoot(root);
+    }
+
+    public void printTreeFirstRoot(){
+        printTreeFirstRoot(root);
+    }
+
+    public void printTreeLastRoot(){
+        printTreeLastRoot(root);
+    }
+
+    /**
+     * 后序遍历  先遍历 左子树和右子树 在遍历当前元素
+     * 叶子节点高度为 0 则 叶子节点的左右子节点高度为 -1
+     * @param avlNode
+     * @return
+     */
+    public int currentHeight(AvlNode<T> avlNode){
+        if (avlNode == null){
+            return -1;
+        }else {
+            return 1 + Math.max(currentHeight(avlNode.right), currentHeight(avlNode.left));
+        }
+    }
+
+    /**
+     * 中序遍历  左子节点 当前节点 右子节点
+     */
+    private void printTreeMidRoot(AvlNode<T> avlNode){
+        if (avlNode != null){
+            printTreeMidRoot(avlNode.left);
+            System.out.println(avlNode.data + "height:" + currentHeight(avlNode));
+            printTreeMidRoot(avlNode.right);
+        }
+    }
+
+    /**
+     * 先序遍历  当前节点 左节点 右节点
+     * @param avlNode
+     */
+    private void printTreeFirstRoot(AvlNode<T> avlNode){
+        if (avlNode != null){
+            System.out.println(avlNode.data + "height:" + currentHeight(avlNode));
+            printTreeFirstRoot(avlNode.left);
+            printTreeFirstRoot(avlNode.right);
+        }
+    }
+
+    /**
+     * 左节点 右节点 当前节点
+     * @param avlNode
+     */
+    private void printTreeLastRoot(AvlNode<T> avlNode){
+        if (avlNode != null){
+            printTreeLastRoot(avlNode.left);
+            printTreeLastRoot(avlNode.right);
+            System.out.println(avlNode.data + "height:" + currentHeight(avlNode));
+        }
     }
 
     @Data
@@ -185,6 +245,12 @@ public class AvlTree<T extends Comparable<? super T>> {
         for (Integer i : data){
             avlTree.insert(i);
         }
+
+        avlTree.printTreeMidRoot();
+        System.out.println();
+        avlTree.printTreeFirstRoot();
+        System.out.println();
+        avlTree.printTreeLastRoot();
     }
 
 }

@@ -13,14 +13,14 @@ import java.util.List;
 @Data
 public class SeparateLinkHashTable<T> {
 
-    private List<T>[] data;
+    private List<T>[] dataArray;
     private int currentSize;
     /**
      * 选择默认大小 各有各的考量
      * 选择 素数 可能比非素数有更好的性能
      * 选择 2的n次幂  则是为了方便 在定位到具体数组位置时 可以用 hashCode & (2^n - 1)
      */
-    private static final int DEFAULT_SIZE = 100;
+    private static final int DEFAULT_SIZE = 10;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
 
     public SeparateLinkHashTable() {
@@ -29,20 +29,24 @@ public class SeparateLinkHashTable<T> {
 
     @SuppressWarnings("all")
     public SeparateLinkHashTable(int capacity){
-        data = new LinkedList[Prime.nextPrime(capacity)];
+        dataArray = new LinkedList[Prime.nextPrime(capacity)];
     }
 
     private int myHash(T object){
         int h;
-        return object == null ? 0 : (h = object.hashCode()) ^ h >>> 16;
+        int hash = object == null ? 0 : (h = object.hashCode()) ^ h >>> 16;
+        int index = hash % dataArray.length;
+        if (index < 0 ){
+            index =  index + dataArray.length;
+        }
+        return index;
     }
 
     public void insert(T t){
-        int hash = myHash(t);
-        int index = hash % data.length;
-        List<T> tList = data[index];
+        int index = myHash(t);
+        List<T> tList = dataArray[index];
         if (tList == null){
-            data[index] = tList = new LinkedList<>();
+            dataArray[index] = tList = new LinkedList<>();
             tList.add(t);
             currentSize++;
         }else {
@@ -54,15 +58,13 @@ public class SeparateLinkHashTable<T> {
             tList.add(t);
             currentSize++;
         }
-        if (currentSize > data.length * DEFAULT_LOAD_FACTOR){
+        if (currentSize > dataArray.length * DEFAULT_LOAD_FACTOR){
             reHash();
         }
     }
 
     public void remove(T t){
-        int hash = myHash(t);
-        int index = hash % data.length;
-        List<T> tList = data[index];
+        List<T> tList = dataArray[myHash(t)];
         boolean remove = tList.remove(t);
         if (remove){
             currentSize--;
@@ -71,8 +73,7 @@ public class SeparateLinkHashTable<T> {
 
 
     public boolean contains(T t){
-        int hash = myHash(t);
-        List<T> list = data[hash % data.length];
+        List<T> list = dataArray[myHash(t)];
         if (list == null){
             return false;
         }else {
@@ -87,8 +88,8 @@ public class SeparateLinkHashTable<T> {
 
     @SuppressWarnings("all")
     private void reHash(){
-        List<T>[] oldData = this.data;
-        data = new LinkedList[Prime.nextPrime(oldData.length * 2)];
+        List<T>[] oldData = this.dataArray;
+        dataArray = new LinkedList[Prime.nextPrime(oldData.length * 2)];
         currentSize = 0;
         for (List<T> list : oldData){
             if (list != null){
@@ -100,10 +101,12 @@ public class SeparateLinkHashTable<T> {
     }
 
     public static void main(String[] args){
+        long l = System.nanoTime();
         SeparateLinkHashTable<String> stringSeparateLinkHashTable = new SeparateLinkHashTable<>(2);
-        for (int i = 0; i < 22; i++) {
+        for (int i = 0; i < 220000; i++) {
             stringSeparateLinkHashTable.insert(String.valueOf(i));
         }
+        System.out.println(System.nanoTime() - l);
     }
 
 }

@@ -83,7 +83,7 @@ public class AvlTree<T extends Comparable<? super T>> {
     }
 
     /**
-     * 左节点 右节点 当前节点
+     * 后序遍历 左节点 右节点 当前节点
      * @param avlNode
      */
     private void printTreeLastRoot(AvlNode<T> avlNode){

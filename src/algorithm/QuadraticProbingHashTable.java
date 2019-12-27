@@ -64,7 +64,7 @@ public class QuadraticProbingHashTable<T> {
     }
 
     /**
-     * 开放定址的关键  为当前元素找到一个 为空或者节点已经失效的位置
+     * 开放定址的关键  为当前元素找到一个 为空 或者 节点已经失效 或者 相同
      * @param t
      * @return
      */
@@ -77,6 +77,10 @@ public class QuadraticProbingHashTable<T> {
             currentPosition += offset;
             offset += 2;
 
+            /**
+             * 数组的界是  0 - （数组长度-1）
+             * 少写了个等于号  会报数组越界异常的
+             */
             if (currentPosition >= dataArray.length){
                 currentPosition = currentPosition - dataArray.length;
             }

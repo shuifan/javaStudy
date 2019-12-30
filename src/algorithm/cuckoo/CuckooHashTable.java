@@ -148,9 +148,6 @@ public class CuckooHashTable<T> {
         if (index < 0 ){
             index = index + dataArray.length;
         }
-        if (index >= dataArray.length){
-            index = index - dataArray.length;
-        }
         return index;
     }
 

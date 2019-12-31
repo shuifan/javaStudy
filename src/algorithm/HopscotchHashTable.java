@@ -80,7 +80,15 @@ public class HopscotchHashTable<T> {
                 Node<T> tNode = dataArray[currentIndex];
                 if (tNode == null){
                     dataArray[currentIndex] = new Node<>(t);
+                    /**
+                     * 找到位置后 既要完善新插入元素的hop
+                     * 也要 完善 hash位置的元素的hop
+                     * 
+                     * 插入一个元素其实影响了两个位置的 hop  插入位置 和 元素 hash值位置
+                     *
+                     */
                     perfectHop(currentIndex);
+                    perfectHop(tHashIndex);
                     currentSize++;
                     return;
                 }
@@ -106,7 +114,9 @@ public class HopscotchHashTable<T> {
                     break;
                 }
             }
-            //执行到此处 说明前面可到达范围内的值均无法往后再移动，此时需要再hash
+            /**
+             * 执行到此处 说明前面可到达范围内的值均无法往后再移动，此时需要再hash
+             */
             rehash();
         }
         dataArray[firstEmptyIndex] = new Node<>(t);
@@ -132,6 +142,8 @@ public class HopscotchHashTable<T> {
             if (indexPlusI < dataArray.length){
                 Node<T> tNode = dataArray[indexPlusI];
                 if (tNode != null){
+                    System.out.println(myHash(tNode.data));
+                    System.out.println(index);
                     if (myHash(tNode.data) == index){
                         hop = setBinaryIndexValue(hop, i, 1);
                     }

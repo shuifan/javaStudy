@@ -11,6 +11,9 @@ import java.util.Random;
  * 跳房子散列
  * 线性开放定址的扩展，规定一个MAX_DIST hash处的值可以存放在 hash 到 hash + MAX_DIST -1 的位置上
  * 由此得到最坏情况下的查找时间为 O(MAX_DIST)
+ *
+ * 跳房子散列 插入元素或者是移动元素，都会影响两个位置的hop值 需要更新两次
+ * 删除只影响 元素hash位置的hop值   需要更新一次
  * @param <T>
  */
 @Data
@@ -83,7 +86,7 @@ public class HopscotchHashTable<T> {
                     /**
                      * 找到位置后 既要完善新插入元素的hop
                      * 也要 完善 hash位置的元素的hop
-                     * 
+                     *
                      * 插入一个元素其实影响了两个位置的 hop  插入位置 和 元素 hash值位置
                      *
                      */

@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 跳房子散列
@@ -13,7 +14,7 @@ import java.util.List;
  * @param <T>
  */
 @Data
-public class HopScotchHashTable<T> {
+public class HopscotchHashTable<T> {
 
     private static final int DEFAULT_CAPACITY = 10;
     private static final double DEFAULT_LOAD_FACTOR = 0.8;
@@ -23,8 +24,8 @@ public class HopScotchHashTable<T> {
     private Node<T>[] dataArray;
 
     @SuppressWarnings("all")
-    public HopScotchHashTable() {
-        dataArray = (Node<T>[])new Object[Prime.nextPrime(DEFAULT_CAPACITY)];
+    public HopscotchHashTable() {
+        dataArray = new Node[Prime.nextPrime(DEFAULT_CAPACITY)];
     }
 
     @Data
@@ -33,6 +34,18 @@ public class HopScotchHashTable<T> {
         //这个字段记录 当前位置 到 当前位置 + MAX_DIST - 1
         // 范围内hash值为当前位置值的 相对位置
         private int hop;
+
+        public Node() {
+        }
+
+        public Node(T data) {
+            this.data = data;
+        }
+
+        public Node(T data, int hop) {
+            this.data = data;
+            this.hop = hop;
+        }
     }
 
     public boolean contains(T t){
@@ -56,23 +69,54 @@ public class HopScotchHashTable<T> {
         if (contains(t)){
             return;
         }
-        if (currentSize > DEFAULT_CAPACITY * DEFAULT_LOAD_FACTOR){
+        if (currentSize > dataArray.length * DEFAULT_LOAD_FACTOR){
             rehash();
         }
 
-        int index = myHash(t);
+        int tHashIndex = myHash(t);
         for (int i = 0; i < MAX_DIST; i++) {
-            int currentIndex = index + i;
-            Node<T> tNode = dataArray[currentIndex];
-            if (tNode == null){
-
+            int currentIndex = tHashIndex + i;
+            if (currentIndex < dataArray.length){
+                Node<T> tNode = dataArray[currentIndex];
+                if (tNode == null){
+                    dataArray[currentIndex] = new Node<>(t);
+                    perfectHop(currentIndex);
+                    currentSize++;
+                    return;
+                }
             }
         }
+        int firstEmptyIndex = MAX_DIST;
+        while (dataArray[firstEmptyIndex] != null){
+            firstEmptyIndex++;
+        }
+        int maxDistMinus1 = MAX_DIST - 1;
+        while ((firstEmptyIndex - tHashIndex) > maxDistMinus1){
+            int startIndex = firstEmptyIndex - maxDistMinus1;
+            for (int i = 0; i < maxDistMinus1; i++) {
+                int startPlusI = startIndex + i;
+                Node<T> tNode = dataArray[startPlusI];
+                if (tNode != null &&tNode.getHop() > 0){
+                    List<Integer> integers = binaryToList(tNode.getHop());
+                    int replaceIndex = integers.get(0) + startPlusI;
+                    dataArray[firstEmptyIndex] = new Node<>(dataArray[replaceIndex].getData());
+                    perfectHop(firstEmptyIndex);
+                    dataArray[replaceIndex] = null;
+                    firstEmptyIndex = replaceIndex;
+                    break;
+                }
+            }
+            //执行到此处 说明前面可到达范围内的值均无法往后再移动，此时需要再hash
+            rehash();
+        }
+        dataArray[firstEmptyIndex] = new Node<>(t);
+        perfectHop(firstEmptyIndex);
     }
 
     private void rehash(){
         Node<T>[] oldArray = this.dataArray;
-        dataArray = (Node<T>[])new Object[Prime.nextPrime(oldArray.length * 2)];
+        dataArray = new Node[Prime.nextPrime(oldArray.length * 2)];
+        currentSize = 0;
         for (Node<T> tNode : oldArray){
             if (tNode != null){
                 insert(tNode.data);
@@ -81,27 +125,33 @@ public class HopScotchHashTable<T> {
     }
 
 
-    private int getHop(int hash){
+    private void perfectHop(int index){
         int hop = 0;
         for (int i = 0; i < MAX_DIST; i++) {
-            Node<T> tNode = dataArray[hash + i];
-            if (tNode != null){
-                if (myHash(tNode.data) == hash){
-                    hop = setBinaryIndexValue(hop, i, 1);
+            int indexPlusI = index + i;
+            if (indexPlusI < dataArray.length){
+                Node<T> tNode = dataArray[indexPlusI];
+                if (tNode != null){
+                    if (myHash(tNode.data) == index){
+                        hop = setBinaryIndexValue(hop, i, 1);
+                    }
                 }
             }
         }
-        return hop;
+        dataArray[index].setHop(hop);
     }
 
     private int findPos(T t){
         int index = myHash(t);
         Node<T> tNode = dataArray[index];
         if (tNode != null){
+            if (tNode.data.equals(t)){
+                return index;
+            }
             List<Integer> binaryToList = binaryToList(tNode.getHop());
             for (Integer i : binaryToList){
                 int cur = i + index;
-                if (dataArray[cur].equals(t)){
+                if (dataArray[cur].data.equals(t)){
                     return cur;
                 }
             }
@@ -153,6 +203,21 @@ public class HopScotchHashTable<T> {
             return hop + pow;
         }
         return hop;
+    }
+
+    public static void main(String[] args){
+        Random random = new Random();
+        List<String> strings = new LinkedList<>();
+        for (int i = 0; i < 5; i++) {
+            strings.add(String.valueOf(random.nextInt()));
+        }
+        HopscotchHashTable<String> hopscotchHashTable = new HopscotchHashTable<>();
+        for (String s : strings){
+            hopscotchHashTable.insert(s);
+        }
+        for (String s : strings){
+            System.out.println(hopscotchHashTable.contains(s));;
+        }
     }
 
 }

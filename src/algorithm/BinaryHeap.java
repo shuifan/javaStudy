@@ -1,6 +1,8 @@
 package algorithm;
 
-import com.sun.xml.internal.ws.resources.UtilMessages;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * 用二叉堆实现优先级队列
@@ -22,7 +24,21 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     @SuppressWarnings("all")
     public BinaryHeap() {
-        dataArray = (T[]) new Object[Prime.nextPrime(DEFAULT_CAPACITY)];
+        dataArray = (T[]) new Comparable[Prime.nextPrime(DEFAULT_CAPACITY)];
+    }
+
+    @SuppressWarnings("all")
+    public BinaryHeap(T[] tArray){
+        currentSize = tArray.length;
+        dataArray = (T[]) new Comparable[Prime.nextPrime(currentSize + 1)];
+        int i = 1;
+        for (T t : tArray){
+            if (t != null){
+                dataArray[i] = t;
+                i++;
+            }
+        }
+        buildHeap();
     }
 
     public void insert(T t){
@@ -44,6 +60,8 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         }
         T t = dataArray[1];
         dataArray[1] = dataArray[currentSize];
+        dataArray[currentSize] = null;
+        currentSize--;
         percolateDown(1);
         return t;
     }
@@ -51,7 +69,7 @@ public class BinaryHeap<T extends Comparable<? super T>> {
     @SuppressWarnings("all")
     private void expand(){
         T[] oldArray = this.dataArray;
-        dataArray = (T[]) new Object[Prime.nextPrime(oldArray.length * 2)];
+        dataArray = (T[]) new Comparable[Prime.nextPrime(oldArray.length * 2)];
         for (int i = 0; i < oldArray.length; i++) {
             T t = oldArray[i];
             if (t != null){
@@ -73,10 +91,11 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     private void percolateDown(int index){
         int tmpLeft = index * 2;
-        while (dataArray[tmpLeft] != null){
+        while (tmpLeft <= currentSize && dataArray[tmpLeft] != null){
             int tmpIndex = tmpLeft;
-            if (dataArray[tmpLeft + 1] != null){
-                tmpIndex = dataArray[tmpLeft].compareTo(dataArray[tmpLeft + 1]) < 0 ? tmpLeft : tmpLeft + 1;
+            int tmpRight = tmpLeft + 1;
+            if (tmpRight <= currentSize && dataArray[tmpRight] != null){
+                tmpIndex = dataArray[tmpLeft].compareTo(dataArray[tmpRight]) < 0 ? tmpLeft : tmpRight;
             }
             if (dataArray[tmpIndex].compareTo(dataArray[index]) < 0){
                 T t = dataArray[tmpIndex];
@@ -88,5 +107,26 @@ public class BinaryHeap<T extends Comparable<? super T>> {
                 break;
             }
         }
+    }
+
+    private void buildHeap(){
+        for (int i = currentSize / 2; i > 0 ;i--) {
+            percolateDown(i);
+        }
+    }
+
+    public static void main(String[] args){
+        Random random = new Random();
+        BinaryHeap<Integer> binaryHeap = new BinaryHeap<>();
+        for (int i = 0; i < 10; i++) {
+            int index = random.nextInt(100);
+            System.out.println(index);
+            binaryHeap.insert(index);
+        }
+
+        for (int i = 0; i < 11; i++) {
+            System.out.println(binaryHeap.deleteMin());
+        }
+
     }
 }

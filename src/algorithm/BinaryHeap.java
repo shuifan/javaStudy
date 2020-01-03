@@ -60,6 +60,9 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         }
         T t = dataArray[1];
         dataArray[1] = dataArray[currentSize];
+        /**
+         * 忘记置null的后果就是 内存泄漏
+         */
         dataArray[currentSize] = null;
         currentSize--;
         percolateDown(1);

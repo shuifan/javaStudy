@@ -120,16 +120,15 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     public static void main(String[] args){
         Random random = new Random();
-        BinaryHeap<Integer> binaryHeap = new BinaryHeap<>();
+        Integer[] integers = new Integer[10];
         for (int i = 0; i < 10; i++) {
-            int index = random.nextInt(100);
-            System.out.println(index);
-            binaryHeap.insert(index);
+            integers[i] = random.nextInt(1000);
+        }
+        BinaryHeap<Integer> binaryHeap = new BinaryHeap<>(integers);
+        for (int i = 0; i < 11; i++) {
+            System.out.println(binaryHeap.deleteMin());;
         }
 
-        for (int i = 0; i < 11; i++) {
-            System.out.println(binaryHeap.deleteMin());
-        }
 
     }
 }

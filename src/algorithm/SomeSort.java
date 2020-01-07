@@ -1,5 +1,6 @@
 package algorithm;
 
+import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -26,15 +27,79 @@ public class SomeSort {
         }
     }
 
+    /**
+     * 使用shell建议序列的 shell排序
+     * 有一组序列 h1 h2 h3 .... ht
+     * 对于 hk 有 从 hk 到 n-1的位置上i，将i 放入 i i-hk .. 中的合适位置上
+     * @param a
+     * @param <T>
+     */
+    public static <T extends Comparable<? super T>> void shellSortWithShellArray(T[] a){
+        for (int gap = a.length / 2; gap > 0; gap /= 2){
+            for (int i = gap; i < a.length; i++){
+                T tmp = a[i];
+                int j;
+                for (j = i; j  >= gap && tmp.compareTo(a[j - gap]) < 0; j -= gap){
+                    a[j] = a[j - gap];
+                }
+                a[j] = tmp;
+            }
+        }
+    }
+
+    /**
+     * 基于二叉堆的 排序
+     * @param dataArray
+     * @param <T>
+     */
+    public static <T extends Comparable<? super T>> void heapSort(T[] dataArray, int size){
+        for (int i = size / 2; i >= 0; i--){
+            percolateDown(dataArray, i, size);
+        }
+        for (int i = size - 1; i > 0; i--) {
+            T t = dataArray[0];
+            dataArray[0] = dataArray[i];
+            dataArray[i] = t;
+            percolateDown(dataArray, 0, i);
+        }
+    }
+
+    private static <T extends Comparable<? super T>> void percolateDown(T[] dataArray, int i, int currentSize){
+
+        int leftChildIndex = i * 2 + 1;
+        if (i < currentSize){
+            T tmp = dataArray[i];
+            while (leftChildIndex < currentSize){
+                int rightChildIndex = leftChildIndex + 1;
+                int littleIndex = leftChildIndex;
+                if (rightChildIndex < currentSize){
+                    if (dataArray[rightChildIndex].compareTo(dataArray[leftChildIndex]) < 0){
+                        littleIndex = rightChildIndex;
+                    }
+                }
+                if (tmp.compareTo(dataArray[littleIndex]) > 0){
+                    dataArray[i] = dataArray[littleIndex];
+                    i = littleIndex;
+                    leftChildIndex = i * 2 + 1;
+                }else {
+                    break;
+                }
+            }
+            dataArray[i] = tmp;
+        }
+
+    }
+
 
     public static void main(String[] args){
         Random random = new Random();
-        Integer[] integers = new Integer[10];
-        for (int i = 0; i < 10; i++) {
-            integers[i] = random.nextInt(1000);
+        Integer[] integers = new Integer[1000000];
+        for (int i = 0; i < 1000000; i++) {
+            integers[i] = random.nextInt(1000000);
         }
 
-        insertionSort(integers);
-        System.out.println(Arrays.toString(integers));
+        long l = System.nanoTime();
+        shellSortWithShellArray(integers);
+        System.out.println(System.nanoTime() - l);
     }
 }

@@ -1,6 +1,5 @@
 package algorithm;
 
-import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -90,16 +89,64 @@ public class SomeSort {
 
     }
 
+    /**
+     * 归并排序
+     * @param dataArray
+     * @param <T>
+     */
+    public static <T extends Comparable<? super T>> void mergeSort(T[] dataArray){
+        T[] tmpArray = (T[]) new Comparable[dataArray.length];
+        mergeSort(dataArray, tmpArray, 0, dataArray.length - 1);
+    }
+
+    private static <T extends Comparable<? super T>> void mergeSort(T[] dataArray, T[] tmpArray, int left, int right){
+        //基准条件  left = right - 1  其实这种就是 两组 每组一个数字，将他们排序并放入数组中相同的位置上
+        if (left < right){
+            int center = (left + right) / 2;
+            mergeSort(dataArray, tmpArray, left, center);
+            mergeSort(dataArray, tmpArray, center + 1, right);
+            merge(dataArray, tmpArray, left, center + 1, right);
+        }
+    }
+
+    private static <T extends Comparable<? super T>> void merge(T[] dataArray, T[] tmpArray, int left, int rightPos, int rightEnd){
+
+        int leftEnd = rightPos - 1;
+        int tmpIndex = left;
+        int size = rightEnd - left + 1;
+
+        while (left <= leftEnd && rightPos <= rightEnd){
+            if (dataArray[left].compareTo(dataArray[rightPos]) < 0){
+                tmpArray[tmpIndex++] = dataArray[left++];
+            }else {
+                tmpArray[tmpIndex++] = dataArray[rightPos++];
+            }
+        }
+
+        while (left <= leftEnd){
+            tmpArray[tmpIndex++] = dataArray[left++];
+        }
+
+        while (rightPos <= rightEnd){
+            tmpArray[tmpIndex++] = dataArray[rightPos++];
+        }
+
+        for (int i = 0; i < size; i++, rightEnd--) {
+            dataArray[rightEnd] = tmpArray[rightEnd];
+        }
+    }
 
     public static void main(String[] args){
+        int range = 10000000;
         Random random = new Random();
-        Integer[] integers = new Integer[1000000];
-        for (int i = 0; i < 1000000; i++) {
-            integers[i] = random.nextInt(1000000);
+        Integer[] integers = new Integer[range];
+        for (int i = 0; i < range; i++) {
+            integers[i] = random.nextInt(range);
         }
 
         long l = System.nanoTime();
-        shellSortWithShellArray(integers);
+        mergeSort(integers);
         System.out.println(System.nanoTime() - l);
+
     }
 }

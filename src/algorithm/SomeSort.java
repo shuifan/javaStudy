@@ -89,6 +89,7 @@ public class SomeSort {
 
     /**
      * 归并排序
+     * 将序列递归地一份为二，基准条件为 left<right，达到基准条件时，序列中只有两个值，每个值视为一个有序序列，将这些有序序列递归地合并为一个序列
      * @param dataArray
      * @param <T>
      */
@@ -156,6 +157,33 @@ public class SomeSort {
         T t = a[i];
         a[i] = a[j];
         a[j] = t;
+    }
+
+    /**
+     * 快速排序 基准条件为 left < tight， 先用三值法找出一个枢纽元素，然后比枢纽值小的放一边，大的放一边，两边继续递归
+     * @param dataArray
+     * @param <T>
+     */
+    public static <T extends Comparable<? super T>> void quickSort(T[] dataArray){
+
+    }
+
+    private static <T extends Comparable<? super T>> void quickSort(T[] dataArray, int left, int right){
+
+    }
+
+    /**
+     * 3值法取一个枢纽值
+     * 附加的  将left center right 中的小点的值移到left 大点的值移到 right 这样 在分割时，操作的范围就缩小了2
+     * 从原来的 left right 变为  left+1 right-1
+     * 另外 将 枢纽值 和 right-1交换，则操作的范围变为 right - 2
+     * @param dataArray
+     * @param left
+     * @param right
+     * @param <T>
+     */
+    private static <T extends Comparable<? super T>> void median3(T[] dataArray, int left, int right){
+
     }
 
     public static void main(String[] args){

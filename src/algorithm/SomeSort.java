@@ -109,12 +109,23 @@ public class SomeSort {
         }
     }
 
+    /**
+     * 将两个有序序列合并为一个 序列
+     * @param dataArray
+     * @param tmpArray
+     * @param left
+     * @param rightPos
+     * @param rightEnd
+     * @param <T>
+     */
     private static <T extends Comparable<? super T>> void merge(T[] dataArray, T[] tmpArray, int left, int rightPos, int rightEnd){
 
         int leftEnd = rightPos - 1;
         int tmpIndex = left;
         int size = rightEnd - left + 1;
 
+        //依次从头开始比较 将较小的放入临时数组中
+        //这一步做完之后 一定有一个数组空了 将另外一个数组中剩下的元素（都是较大的元素）搬入临时数组即可
         while (left <= leftEnd && rightPos <= rightEnd){
             if (dataArray[left].compareTo(dataArray[rightPos]) < 0){
                 tmpArray[tmpIndex++] = dataArray[left++];

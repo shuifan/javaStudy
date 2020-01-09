@@ -56,9 +56,7 @@ public class SomeSort {
             percolateDown(dataArray, i, size);
         }
         for (int i = size - 1; i > 0; i--) {
-            T t = dataArray[0];
-            dataArray[0] = dataArray[i];
-            dataArray[i] = t;
+            swapReferences(dataArray, 0, i);
             percolateDown(dataArray, 0, i);
         }
     }
@@ -145,6 +143,19 @@ public class SomeSort {
         for (int i = 0; i < size; i++, rightEnd--) {
             dataArray[rightEnd] = tmpArray[rightEnd];
         }
+    }
+
+    /**
+     * 把将数组中两个位置的值交换  封装起来 用的很多
+     * @param a
+     * @param i
+     * @param j
+     * @param <T>
+     */
+    private static <T extends Comparable<? super T>> void swapReferences(T[] a, int i, int j){
+        T t = a[i];
+        a[i] = a[j];
+        a[j] = t;
     }
 
     public static void main(String[] args){

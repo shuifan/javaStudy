@@ -15,11 +15,11 @@ public class SomeSort {
      * @param a
      * @param <T>
      */
-    public static <T extends Comparable<? super T>> void insertionSort(T[] a){
+    public static <T extends Comparable<? super T>> void insertionSort(T[] a, int left, int right){
         int j;
-        for (int i = 1; i < a.length ; i++){
+        for (int i = left; i <= right ; i++){
             T tmp = a[i];
-            for (j = i; j > 0 && tmp.compareTo(a[j - 1]) < 0; j--){
+            for (j = i; j > left && tmp.compareTo(a[j - 1]) < 0; j--){
                 a[j] = a[j - 1];
             }
             a[j] = tmp;
@@ -153,7 +153,7 @@ public class SomeSort {
      * @param j
      * @param <T>
      */
-    private static <T extends Comparable<? super T>> void swapReferences(T[] a, int i, int j){
+    public static <T extends Comparable<? super T>> void swapReferences(T[] a, int i, int j){
         T t = a[i];
         a[i] = a[j];
         a[j] = t;
@@ -165,11 +165,33 @@ public class SomeSort {
      * @param <T>
      */
     public static <T extends Comparable<? super T>> void quickSort(T[] dataArray){
-
+        quickSort(dataArray, 0, dataArray.length - 1);
     }
 
     private static <T extends Comparable<? super T>> void quickSort(T[] dataArray, int left, int right){
-
+        //长度超过10的用 quickSort 小于10的直接插入排序
+        if (left + 10 <= right){
+            //3值法之后 left的位置放的比枢纽值小的 right放的比枢纽值大的 枢纽值放在 right-1 的位置
+            T pivot = median3(dataArray, left, right);
+            int i = left;
+            int j = right - 1;
+            //此循环结束 i在第一个>=pivot的位置
+            while (true){
+                while (dataArray[++i].compareTo(pivot) < 0){}
+                while (dataArray[--j].compareTo(pivot) > 0){}
+                if (i < j){
+                    swapReferences(dataArray, i, j);
+                }else {
+                    break;
+                }
+            }
+            //将枢纽值放回原位
+            swapReferences(dataArray, i, right - 1);
+            quickSort(dataArray, left, i - 1);
+            quickSort(dataArray, i + 1, right);
+        }else {
+            insertionSort(dataArray, left, right);
+        }
     }
 
     /**
@@ -182,12 +204,25 @@ public class SomeSort {
      * @param right
      * @param <T>
      */
-    private static <T extends Comparable<? super T>> void median3(T[] dataArray, int left, int right){
+    public static <T extends Comparable<? super T>> T median3(T[] dataArray, int left, int right){
+        int center = (left + right) / 2;
+        if (dataArray[right].compareTo(dataArray[center]) < 0){
+            swapReferences(dataArray, right, center);
+        }
+        if (dataArray[right].compareTo(dataArray[left]) < 0){
+            swapReferences(dataArray, right, left);
+        }
+        if (dataArray[center].compareTo(dataArray[left]) < 0){
+            swapReferences(dataArray, center, left);
+        }
 
+        swapReferences(dataArray, center, right - 1);
+        //注意 此时枢纽值已经在 right - 1的位置上了 不能返回center位置的值
+        return dataArray[right - 1];
     }
 
     public static void main(String[] args){
-        int range = 10000000;
+        int range = 100000000;
         Random random = new Random();
         Integer[] integers = new Integer[range];
         for (int i = 0; i < range; i++) {
@@ -195,7 +230,7 @@ public class SomeSort {
         }
 
         long l = System.nanoTime();
-        mergeSort(integers);
+        quickSort(integers);
         System.out.println(System.nanoTime() - l);
 
     }

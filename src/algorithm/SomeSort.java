@@ -297,6 +297,8 @@ public class SomeSort {
         for (int pos = maxLength - 1; pos >= 0; pos--){
             int lengthPos = pos + 1;
             int size = 0;
+            //对于每个长度lengthPos，需要对 所有长度 >=lengthPos 的字符进行桶排序
+            // 所以需要统计长度>=lengthPos的字符的数量
             while (lengthPos < lengthArray.length){
                 if (lengthArray[lengthPos] != null){
                     size += lengthArray[lengthPos].size();

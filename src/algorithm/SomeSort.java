@@ -250,10 +250,8 @@ public class SomeSort {
                     for (String s : strings){
                         stringArray[j++] = s;
                     }
+                    strings.clear();
                 }
-            }
-            for (int k = 0; k < 256; k++) {
-                bucketArray[k] = null;
             }
         }
 

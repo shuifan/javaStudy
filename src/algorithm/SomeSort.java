@@ -1,9 +1,10 @@
 package algorithm;
 
+import sun.awt.image.ImageWatched;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 各种排序
@@ -232,7 +233,7 @@ public class SomeSort {
      * @param length
      */
     @SuppressWarnings("all")
-    public static void radixSortForString(String[] stringArray, int length){
+    public static void radixSortForStringWithFixLength(String[] stringArray, int length){
         List<String>[] bucketArray = new LinkedList[256];
         for (int i = length - 1; i >= 0; i--) {
             for (String s : stringArray){
@@ -250,6 +251,7 @@ public class SomeSort {
                     for (String s : strings){
                         stringArray[j++] = s;
                     }
+                    //清空链表 下个循环用
                     strings.clear();
                 }
             }
@@ -257,9 +259,75 @@ public class SomeSort {
 
     }
 
+    /**
+     * 基数排序 字符串长度不固定
+     * 先按照长度排序 长度是个小整数 则 使用 桶排序
+     * 之后将元素按照长度从小到大放入原始数组中
+     * 每轮 只对 长度足够的字符串进行桶排序，从最低位到最高位
+     *
+     * @param stringArray
+     * @param maxLength
+     * @param <T>
+     */
+    public static <T extends Comparable<? super T>> void radixSortForStringDynamic(String[] stringArray, int maxLength){
+        List<String>[] lengthArray = new LinkedList[maxLength + 1];
+        List<String>[] bucketArray = new LinkedList[256];
+        //按长度排序 顺便分类
+        for (String s : stringArray){
+            List<String> strings = lengthArray[s.length()];
+            if (strings == null){
+                lengthArray[s.length()] = strings = new LinkedList<>();
+            }
+            strings.add(s);
+        }
+
+        //按长度顺序存入原数组
+        //存完之后 可以根据lengthArray 中相同长度的字符串数量信息 算出 相同字符串段的起始位置
+        int i = 0;
+        for (List<String> strings : lengthArray){
+            if (strings != null){
+                for (String s : strings){
+                    stringArray[i++] = s;
+                }
+            }
+        }
+
+
+        int totalLength = stringArray.length;
+        for (int pos = maxLength - 1; pos >= 0; pos--){
+            int lengthPos = pos + 1;
+            int size = 0;
+            while (lengthPos < lengthArray.length){
+                if (lengthArray[lengthPos] != null){
+                    size += lengthArray[lengthPos].size();
+                }
+                lengthPos++;
+            }
+            int startPos = totalLength - size;
+            for (int j = startPos; j < totalLength; j++){
+                int index = stringArray[j].charAt(pos);
+                List<String> strings = bucketArray[index];
+                if (strings == null){
+                    bucketArray[index] = strings = new LinkedList<>();
+                }
+                strings.add(stringArray[j]);
+            }
+
+            for (List<String> strings : bucketArray){
+                if (strings != null){
+                    for (String s : strings){
+                        stringArray[startPos++] = s;
+                    }
+                    //清空链表 下个循环用
+                    strings.clear();
+                }
+            }
+        }
+    }
+
     public static void main(String[] args){
-        String[] stringArray = {"ajdj", "lskl", "jjhe", "ejue","jihe", "sjei"};
-        radixSortForString(stringArray, 4);
+        String[] stringArray = {"ajdje", "lskle", "jjhe", "ejue","jihe", "sjei"};
+        radixSortForStringDynamic(stringArray, 5);
         System.out.println(Arrays.toString(stringArray));
     }
 }

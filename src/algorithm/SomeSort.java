@@ -1,6 +1,8 @@
 package algorithm;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -221,17 +223,45 @@ public class SomeSort {
         return dataArray[right - 1];
     }
 
-    public static void main(String[] args){
-        int range = 100000000;
-        Random random = new Random();
-        Integer[] integers = new Integer[range];
-        for (int i = 0; i < range; i++) {
-            integers[i] = random.nextInt(range);
+    /**
+     * 基数排序在桶排序上做了变化，桶排序的问题在于 数组的大小必须比待排序序列中最大的值大，显然有很大的局限性
+     * 基数排序 对字符串来讲，从高位到低位，对于每个字符应用桶排序，则桶的大小为每个字符的可取范围，对第二个字符进行桶排序的数据基于第一个字符桶排序的结果
+     * 定长字符串的基数排序
+     * 前提 用的ascii码，也就是字符地址在 0 - 255之间
+     * @param stringArray
+     * @param length
+     */
+    @SuppressWarnings("all")
+    public static void radixSortForString(String[] stringArray, int length){
+        List<String>[] bucketArray = new LinkedList[256];
+        for (int i = length - 1; i >= 0; i--) {
+            for (String s : stringArray){
+                int index = s.charAt(i);
+                List<String> stringList = bucketArray[index];
+                if (stringList == null){
+                    bucketArray[index] = stringList = new LinkedList<>();
+                }
+                stringList.add(s);
+            }
+
+            int j = 0;
+            for (List<String> strings : bucketArray){
+                if (strings != null){
+                    for (String s : strings){
+                        stringArray[j++] = s;
+                    }
+                }
+            }
+            for (int k = 0; k < 256; k++) {
+                bucketArray[k] = null;
+            }
         }
 
-        long l = System.nanoTime();
-        quickSort(integers);
-        System.out.println(System.nanoTime() - l);
+    }
 
+    public static void main(String[] args){
+        String[] stringArray = {"ajdj", "lskl", "jjhe", "ejue","jihe", "sjei"};
+        radixSortForString(stringArray, 4);
+        System.out.println(Arrays.toString(stringArray));
     }
 }

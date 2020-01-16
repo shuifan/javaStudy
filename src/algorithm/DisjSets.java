@@ -23,7 +23,8 @@ public class DisjSets {
         if (setArray[i] < 0){
             return i;
         }else {
-            return find(setArray[i]);
+            //路径压缩 把整个链上的所有节点的父节点变为根节点 利于下次find操作
+            return setArray[i] = find(setArray[i]);
         }
     }
 

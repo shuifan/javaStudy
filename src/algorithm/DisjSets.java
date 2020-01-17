@@ -6,6 +6,8 @@ import lombok.Data;
  * 不相交集的 union find 算法
  *
  * 数组的每个位置 要么值为 -1 表示此处为根节点， 要么记录的是当前树的高度或者大小，合并操作将小规模的合并到大规模去
+ *
+ * 可以用来生成迷宫
  */
 @Data
 public class DisjSets {
